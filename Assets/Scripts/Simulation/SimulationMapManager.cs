@@ -65,6 +65,7 @@ public class SimulationMapManager : MonoBehaviour
             int count = (idealCountPerInterval * idealOrganismCount / SimulationManager.instance.GetPopulation());
             for (int i = 0; i < count; i++)
             {
+                if (foodCount == maxFoodCount) break;
                 SpawnInMap(SpawnType.Food);
             }
             

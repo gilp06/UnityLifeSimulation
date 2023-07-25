@@ -40,6 +40,7 @@ public class OrganismHandler : MonoBehaviour
     public float actualMaxEnergy;
     [FormerlySerializedAs("actualEnergyConsumption")] public float actualEnergyChange;
     public float actualSpeed;
+    public float actualTurnSpeed;
 
     private float _forwardMove;
     private float _backwardMove;
@@ -140,7 +141,7 @@ public class OrganismHandler : MonoBehaviour
                             transform.up * horizontalMovement;
 
          Vector2 targetVelocity = movement * actualSpeed;
-         float targetAngularVelocity = rotationSpeed * (_turnLeft - _turnRight);
+         float targetAngularVelocity = actualTurnSpeed * (_turnLeft - _turnRight);
 
          _rb.velocity = Vector2.Lerp(_rb.velocity, targetVelocity, 1-Mathf.Exp(-movementSharpness * Time.deltaTime));
          _rb.angularVelocity = Mathf.LerpAngle(_rb.angularVelocity, targetAngularVelocity, 1-Mathf.Exp(-angularSharpness * Time.deltaTime));
@@ -232,10 +233,11 @@ public class OrganismHandler : MonoBehaviour
     {
         _stats = stats;
         actualSpeed = SimulationManager.instance.baseSpeed * stats.speedRatio * (2 - stats.sizeRatio);
+        actualTurnSpeed = rotationSpeed * stats.speedRatio * (2 - stats.sizeRatio);
         actualMaxEnergy = SimulationManager.instance.maxEnergy * stats.sizeRatio;
         _remainingEnergy = startingEnergy;
         transform.localScale = new Vector3(SimulationManager.instance.size, SimulationManager.instance.size, 1) * stats.sizeRatio;
-        GetComponent<SpriteRenderer>().color = new Color(stats.red, stats.green, stats.blue);
+        GetComponent<SpriteRenderer>().color = new Color(stats.red / 255.0f, stats.green / 255.0f , stats.blue, 255.0f);
         _statsSet = true;
     }
 

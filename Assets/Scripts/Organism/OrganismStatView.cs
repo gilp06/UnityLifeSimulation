@@ -54,7 +54,6 @@ public class OrganismStatView : MonoBehaviour
             output += "Field of View: " + Format(_organismHandler.GetStats().fieldOfView) + "\n";
             output += "View Distance: " + Format(_organismHandler.GetStats().maxViewDistance) + "\n";
             output += "Offspring Energy: " + Format(_organismHandler.GetStats().offspringStartingEnergy) + "\n";
-            output += "Offspring Mutations: " + Format(_organismHandler.GetStats().offspringMutationCount) + "\n";
             output += "Offspring Hatch Time: " + Format(_organismHandler.GetStats().offspringHatchTime) + "\n";
             output += "Incubation Time: "+ Format(_organismHandler.reproductionTime) + "/" + Format(_organismHandler.GetStats().offspringIncubateTime) + "\n";
         }

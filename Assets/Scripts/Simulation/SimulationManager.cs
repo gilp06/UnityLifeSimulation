@@ -13,9 +13,7 @@ using Random = UnityEngine.Random;
 public class SimulationManager : MonoBehaviour
 {
     public static SimulationManager instance;
-
     
-
     [Header("Genome Mutation Weights")] 
     [SerializeField] private int addConnectionWeight;
     [SerializeField] private int removeConnectionWeight;
@@ -35,31 +33,12 @@ public class SimulationManager : MonoBehaviour
     public Color color;
     public float fieldOfView;
     public float maxViewDistance;
-    public int offspringMutationCount;
+    public float mutationVariance; 
+    public float averageStatMutationChance;
+    public float averageGenomeMutationChance;
+    
 
-    [Header("Organism Statistic Mutation Weights")]
-    [SerializeField] private int fieldOfViewWeight;
-    [SerializeField] private int maxViewDistanceWeight;
-    [SerializeField] private int speedRatioWeight;
-    [SerializeField] private int sizeRatioWeight;
-    [SerializeField] private int offspringMutationCountWeight;
-    [SerializeField] private int offspringStartingEnergyWeight;
-    [SerializeField] private int offspringIncubateTimeWeight;
-    [SerializeField] private int offspringHatchTimeWeight;
-    [SerializeField] private int colorWeight;
-
-    [Header("Organism Statistic Mutation Ranges")]
-    [SerializeField] private float fieldOfViewRange;
-    [SerializeField] private float maxViewDistanceRange;
-    [SerializeField] private float speedRatioRange;
-    [SerializeField] private float sizeRatioRange;
-    [SerializeField] private int offspringMutationCountRange;
-    [SerializeField] private float offspringStartingEnergyRange;
-    [SerializeField] private float offspringIncubateTimeRange;
-    [SerializeField] private float offspringHatchTimeRange;
-    [SerializeField] private float colorRange;
-
-        [Header("Organism Settings")]
+    [Header("Organism Settings")]
     [SerializeField] private GameObject organismPrefab;
     public int inputCount = 5;
     public int outputCount = 6;
@@ -72,7 +51,7 @@ public class SimulationManager : MonoBehaviour
     
     private List<ConnectableOperator> _connectableOperators;
     private WeightedList<GenomeMutationAction> _randomGenomeMutationActions;
-    private WeightedList<OrganismStatsMutationAction> _randomOrganismStatMutationActions;
+    private List<OrganismStatsMutationAction> _statsMutationActions; 
     public OrganismStats defaultOrganismStats;
     private List<GameObject> _organisms;
     private void Awake()
@@ -95,17 +74,19 @@ public class SimulationManager : MonoBehaviour
 
     private void InitializeRandomStatMutationActions()
     {
-        _randomOrganismStatMutationActions = new WeightedList<OrganismStatsMutationAction>()
+        _statsMutationActions = new List<OrganismStatsMutationAction>()
         {
-            { OrganismStatsMutationAction.MutateFieldOfView, fieldOfViewWeight },
-            { OrganismStatsMutationAction.MutateMaxViewDistance, maxViewDistanceWeight},
-            { OrganismStatsMutationAction.MutateSpeedRatio, speedRatioWeight},
-            { OrganismStatsMutationAction.MutateSizeRatio, sizeRatioWeight},
-            { OrganismStatsMutationAction.MutateOffspringMutationCount , offspringMutationCountWeight},
-            { OrganismStatsMutationAction.MutateOffspringStartingEnergy , offspringStartingEnergyWeight},
-            { OrganismStatsMutationAction.MutateOffspringIncubateTime, offspringIncubateTimeWeight},
-            { OrganismStatsMutationAction.MutateOffspringHatchTime , offspringHatchTimeWeight},
-            { OrganismStatsMutationAction.MutateColor, colorWeight},
+            OrganismStatsMutationAction.MutateFieldOfView,
+            OrganismStatsMutationAction.MutateMaxViewDistance,
+            OrganismStatsMutationAction.MutateSpeedRatio,
+            OrganismStatsMutationAction.MutateSizeRatio,
+            OrganismStatsMutationAction.MutateAverageStatMutationChance,
+            OrganismStatsMutationAction.MutateAverageGenomeMutationChance,
+            OrganismStatsMutationAction.MutateMutationVariance,
+            OrganismStatsMutationAction.MutateOffspringStartingEnergy,
+            OrganismStatsMutationAction.MutateOffspringIncubateTime,
+            OrganismStatsMutationAction.MutateOffspringHatchTime,
+            OrganismStatsMutationAction.MutateColor,
         };
     }
 
@@ -135,13 +116,15 @@ public class SimulationManager : MonoBehaviour
             maxViewDistance,
             1.0f,
             1.0f,
-            offspringMutationCount,
+            averageStatMutationChance,
+            averageGenomeMutationChance,
+            mutationVariance,
             offspringStartingEnergy,
             offspringIncubateTime,
             offspringHatchTime,
-            color.r,
-            color.g,
-            color.b
+            color.r * 255f,
+            color.g * 255f,
+            color.b * 255f
         );
     }
 
@@ -164,79 +147,81 @@ public class SimulationManager : MonoBehaviour
     {
         GameObject newOrganism = Instantiate(organismPrefab, location, Quaternion.Euler(0,0,Random.Range(0f,360f)));
         OrganismHandler organismHandler = newOrganism.GetComponent<OrganismHandler>();
-        var childGenome = parentGenome == null ? new Genome(inputCount, outputCount) : new Genome(parentGenome);
         
-        MutateGenome(childGenome, parentStats.offspringMutationCount);
+        //Mutate Genome
+        var childGenome = parentGenome == null ? new Genome(inputCount, outputCount) : new Genome(parentGenome);
+        int genomeMutationCount = CalculateNumberOfMutations(parentStats.averageGenomeMutationChance);
+        MutateGenome(childGenome, genomeMutationCount);
         organismHandler.SetGenome(childGenome);
-
+        
+        //Mutate Stats
         OrganismStats childStats = new OrganismStats(parentStats);
-        MutateStats(childStats, parentStats.offspringMutationCount);
+        int statMutationCount = CalculateNumberOfMutations(parentStats.averageStatMutationChance);
+        MutateStats(childStats, statMutationCount, parentStats.mutationVariance);
         organismHandler.SetBirthStats(childStats, parentStats.offspringStartingEnergy);
+        
+        
         _organisms.Add(newOrganism);
     }
 
-    private void MutateStats(OrganismStats childStats, int mutationCount)
+    private void MutateStats(OrganismStats childStats, int mutationCount, float variance)
     {
-        for (int i = 0; i < Random.Range(1,mutationCount+1); i++)
+        for (int i = 0; i < mutationCount; i++)
         {
-            OrganismStatsMutationAction action = _randomOrganismStatMutationActions.Next();
+            OrganismStatsMutationAction action = _statsMutationActions[Random.Range(0, _statsMutationActions.Count)];
             switch (action)
             {
                 case OrganismStatsMutationAction.MutateFieldOfView:
-                    childStats.fieldOfView += Random.Range(-fieldOfViewRange, fieldOfViewRange);
-                    childStats.fieldOfView = Mathf.Clamp(childStats.fieldOfView, 0.0f, 180.0f);
+                    childStats.fieldOfView = MutateGeneValue(childStats.fieldOfView, variance);
+                    childStats.fieldOfView = Mathf.Clamp(childStats.fieldOfView, 0.0f, 360.0f);
                     break;
                 case OrganismStatsMutationAction.MutateMaxViewDistance:
-                    childStats.maxViewDistance += Random.Range(-maxViewDistanceRange, maxViewDistanceRange);
-                    childStats.maxViewDistance = Mathf.Max(childStats.maxViewDistance, 0.0f);
+                    childStats.maxViewDistance = MutateGeneValue(childStats.maxViewDistance, variance);
+                    childStats.maxViewDistance = Mathf.Clamp(childStats.maxViewDistance, 0.0001f, 200.00f);
                     break;
                 case OrganismStatsMutationAction.MutateSpeedRatio:
-                    childStats.speedRatio += Random.Range(-speedRatioRange, speedRatioRange);
-                    childStats.speedRatio = Mathf.Max(childStats.speedRatio, 0.0f);
+                    childStats.speedRatio = MutateGeneValue(childStats.speedRatio, variance);
+                    childStats.speedRatio = Mathf.Clamp(childStats.speedRatio, 0.0001f, 10.00f);
                     break;
                 case OrganismStatsMutationAction.MutateSizeRatio:
-                    childStats.sizeRatio += Random.Range(-sizeRatioRange, sizeRatioRange);
-                    childStats.sizeRatio = Mathf.Max(childStats.sizeRatio, 0.01f);
+                    childStats.sizeRatio = MutateGeneValue(childStats.sizeRatio, variance);
+                    childStats.sizeRatio = Mathf.Clamp(childStats.sizeRatio, 0.0001f, 10.00f);
                     break;
-                case OrganismStatsMutationAction.MutateOffspringMutationCount:
-                    childStats.offspringMutationCount += Random.Range(-(offspringMutationCountRange),
-                        offspringMutationCountRange + 1);
-                    childStats.offspringMutationCount = Mathf.Max(1, childStats.offspringMutationCount);
+                case OrganismStatsMutationAction.MutateAverageStatMutationChance:
+                    childStats.averageStatMutationChance = MutateGeneValue(childStats.averageStatMutationChance, variance);
+                    break;
+                case OrganismStatsMutationAction.MutateAverageGenomeMutationChance:
+                    childStats.averageGenomeMutationChance = MutateGeneValue(childStats.averageGenomeMutationChance, variance);
+                    break;
+                case OrganismStatsMutationAction.MutateMutationVariance:
+                    childStats.mutationVariance = MutateGeneValue(childStats.mutationVariance, variance);
                     break;
                 case OrganismStatsMutationAction.MutateOffspringStartingEnergy:
-                    childStats.offspringStartingEnergy +=
-                        Random.Range(-offspringStartingEnergyRange, offspringStartingEnergyRange);
-                    childStats.offspringStartingEnergy = Mathf.Max(0.1f, childStats.offspringStartingEnergy);
+                    childStats.offspringStartingEnergy = MutateGeneValue(childStats.offspringStartingEnergy, variance);
                     break;
                 case OrganismStatsMutationAction.MutateOffspringIncubateTime:
-                    childStats.offspringIncubateTime +=
-                        Random.Range(-offspringIncubateTimeRange, offspringIncubateTimeRange);
-                    childStats.offspringIncubateTime = Mathf.Max(0.1f, childStats.offspringIncubateTime);
+                    childStats.offspringIncubateTime = MutateGeneValue(childStats.offspringIncubateTime, variance);
                     break;
                 case OrganismStatsMutationAction.MutateOffspringHatchTime:
-                    childStats.offspringHatchTime +=
-                        Random.Range(-offspringHatchTimeRange, offspringHatchTimeRange);
-                    childStats.offspringHatchTime = Mathf.Max(0.1f, childStats.offspringHatchTime);
+                    childStats.offspringHatchTime = MutateGeneValue(childStats.offspringHatchTime, variance);
                     break;
                 case OrganismStatsMutationAction.MutateColor:
-                    childStats.red += Random.Range(-colorRange, colorRange);
-                    childStats.red = Mathf.Clamp(childStats.red, 0.0f, 1.0f);
-                    
-                    childStats.blue += Random.Range(-colorRange, colorRange);
-                    childStats.blue = Mathf.Clamp(childStats.blue, 0.0f, 1.0f);
-                    
-                    childStats.green += Random.Range(-colorRange, colorRange);
-                    childStats.green = Mathf.Clamp(childStats.green, 0.0f, 1.0f);
-                    break;
-               
+                    childStats.red = MutateGeneValue(childStats.red, variance);
+                    childStats.red = Mathf.Clamp(childStats.red, 0f, 255f);
 
+                    childStats.green = MutateGeneValue(childStats.green, variance);
+                    childStats.green = Mathf.Clamp(childStats.green, 0f, 255f);
+                    
+                    childStats.blue = MutateGeneValue(childStats.blue, variance);
+                    childStats.blue = Mathf.Clamp(childStats.blue, 0f, 255f);
+                    break;
             }
         }
     }
 
     private void MutateGenome(Genome genome, int mutationCount)
     {
-        for (int i = 0; i < Random.Range(1,mutationCount+1); i++)
+        for (int i = 0; i < mutationCount; i++)
         {
             GenomeMutationAction action = _randomGenomeMutationActions.Next();
             switch (action)
@@ -279,9 +264,18 @@ public class SimulationManager : MonoBehaviour
     {
         return _organisms.Count;
     }
+    
 
-    private void Update()
+    private float MutateGeneValue(float value, float variance)
     {
-        
+        float baseValue = value;
+        float u = DistributionMath.NextGaussian(0.0f, 1.0f, -1.0f, 1.0f);
+        float v = Mathf.Pow(1 + variance, u);
+        return baseValue * v;
+    }
+
+    private int CalculateNumberOfMutations(float lambda)
+    {
+        return DistributionMath.NextPoisson(lambda);
     }
 }

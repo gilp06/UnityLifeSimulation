@@ -5,12 +5,15 @@
 
     public float speedRatio;
     public float sizeRatio;
+    
+    public float averageStatMutationChance;
+    public float averageGenomeMutationChance;
+    public float mutationVariance;
 
-    public int offspringMutationCount;
     public float offspringStartingEnergy;
     public float offspringIncubateTime;
     public float offspringHatchTime;
-    
+
     public float red;
     public float blue;
     public float green;
@@ -19,7 +22,9 @@
         float maxViewDistance,
         float speedRatio,
         float sizeRatio,
-        int offspringMutationCount,
+        float averageStatMutationChance,
+        float averageGenomeMutationChance,
+        float mutationVariance,
         float offspringStartingEnergy,
         float offspringIncubateTime,
         float offspringHatchTime,
@@ -31,7 +36,9 @@
         this.maxViewDistance = maxViewDistance;
         this.speedRatio = speedRatio;
         this.sizeRatio = sizeRatio;
-        this.offspringMutationCount = offspringMutationCount;
+        this.mutationVariance = mutationVariance;
+        this.averageStatMutationChance = averageStatMutationChance;
+        this.averageGenomeMutationChance = averageGenomeMutationChance;
         this.offspringStartingEnergy = offspringStartingEnergy;
         this.offspringIncubateTime = offspringIncubateTime;
         this.offspringHatchTime = offspringHatchTime;
@@ -46,10 +53,14 @@
         maxViewDistance = parentStats.maxViewDistance;
         speedRatio = parentStats.speedRatio;
         sizeRatio = parentStats.sizeRatio;
-        offspringMutationCount = parentStats.offspringMutationCount;
+        
+        averageStatMutationChance = parentStats.averageStatMutationChance;
+        mutationVariance = parentStats.mutationVariance;
+        
         offspringStartingEnergy = parentStats.offspringStartingEnergy;
         offspringIncubateTime = parentStats.offspringIncubateTime;
         offspringHatchTime = parentStats.offspringHatchTime;
+        
         red = parentStats.red;
         green = parentStats.green;
         blue = parentStats.blue;
@@ -62,7 +73,9 @@ public enum OrganismStatsMutationAction
     MutateMaxViewDistance,
     MutateSpeedRatio,
     MutateSizeRatio,
-    MutateOffspringMutationCount,
+    MutateAverageStatMutationChance,
+    MutateAverageGenomeMutationChance,
+    MutateMutationVariance,
     MutateOffspringStartingEnergy,
     MutateOffspringIncubateTime,
     MutateOffspringHatchTime,

@@ -103,7 +103,7 @@ MonoBehaviour:
   baseMaximumEnergyUnitsInStomachMultiplier: 1.2
   percentageDigestionRatePerSecond: 0.3
   consumptionRatePerSecond: 20
-  mouthSizeRatio: 0.6
+  mouthSizeRatio: 0.2
 --- !u!114 &4435628552042657964
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -116,7 +116,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9c6105d7bc856fb4ab068edac8743b5c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  rotationSpeed: 360
+  rotationSpeed: 720
   strafeCoefficient: 0.2
   backwardCoefficient: 0.3
   movementSharpness: 2
@@ -127,6 +127,7 @@ MonoBehaviour:
   actualMaxEnergy: 0
   actualEnergyChange: 0
   actualSpeed: 0
+  actualTurnSpeed: 0
 --- !u!50 &1767314223621176788
 Rigidbody2D:
   serializedVersion: 4

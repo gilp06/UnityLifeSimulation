@@ -505,11 +505,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: de82059f7e474d044822c43a67d1a4af, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  addConnectionWeight: 100
+  addConnectionWeight: 80
   removeConnectionWeight: 20
-  addNodeWeight: 45
-  changeWeightingWeight: 30
-  changeNodeOperatorWeight: 35
+  addNodeWeight: 35
+  changeWeightingWeight: 35
+  changeNodeOperatorWeight: 30
   noneMutationWeight: 15
   baseSpeed: 5
   maxEnergy: 30
@@ -521,25 +521,9 @@ MonoBehaviour:
   color: {r: 1, g: 1, b: 1, a: 0}
   fieldOfView: 90
   maxViewDistance: 20
-  offspringMutationCount: 4
-  fieldOfViewWeight: 1
-  maxViewDistanceWeight: 1
-  speedRatioWeight: 2
-  sizeRatioWeight: 2
-  offspringMutationCountWeight: 1
-  offspringStartingEnergyWeight: 1
-  offspringIncubateTimeWeight: 1
-  offspringHatchTimeWeight: 1
-  colorWeight: 2
-  fieldOfViewRange: 3
-  maxViewDistanceRange: 3
-  speedRatioRange: 0.15
-  sizeRatioRange: 0.15
-  offspringMutationCountRange: 1
-  offspringStartingEnergyRange: 2
-  offspringIncubateTimeRange: 0.25
-  offspringHatchTimeRange: 0.25
-  colorRange: 0.1
+  mutationVariance: 1
+  averageStatMutationChance: 1
+  averageGenomeMutationChance: 1
   organismPrefab: {fileID: 3476357127503027257, guid: 84f5743ba0cb55648b97fe0d8e68bc29, type: 3}
   inputCount: 10
   outputCount: 8
@@ -572,13 +556,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c20860c9c0920c64dbaa4cc51db1435d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  startingOrganismCount: 300
+  startingOrganismCount: 200
   startingFoodCount: 12500
   foodCutoff: 0.2
   organismCutoff: 0.5
   mapWidth: 1000
   mapHeight: 1000
-  perlinScale: 6
+  perlinScale: 5
   foodSpawnInterval: 5
   idealCountPerInterval: 20
   idealOrganismCount: 150

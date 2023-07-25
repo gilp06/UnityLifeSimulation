@@ -40,7 +40,7 @@ public class DigestionHandler : MonoBehaviour
     {
         if (_currentEnergyUnitsInStomach >= _maximumEnergyUnitsInStomach) return;
         Collider2D[] hits = Physics2D.OverlapCircleAll(transform.position + transform.right * _collider.bounds.extents.x,
-            _collider.radius * mouthSizeRatio * _stats.sizeRatio);
+            _collider.bounds.extents.x * mouthSizeRatio);
         Debug.DrawLine(transform.position, transform.position + transform.right * _collider.bounds.extents.x, Color.cyan);
         
         foreach (var hit in hits)
