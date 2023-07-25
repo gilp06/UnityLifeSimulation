@@ -174,13 +174,11 @@ public class OrganismHandler : MonoBehaviour
 
                 if (Mathf.Abs(angle) > _stats.fieldOfView / 2.0f) continue;
                 
-                Debug.DrawLine(transform.position, hit.transform.position);
                 
                 Transform hitTransform = hit.transform;
                 if (hitTransform.CompareTag("organism"))
                 {
                     var distance = (hit.transform.position - transform.position).magnitude;
-                    Debug.DrawLine(transform.position, hit.transform.position);
                     _nearbyOrganismCount++;
                     if (_nearestOrganismDistance > distance)
                     {
@@ -192,7 +190,6 @@ public class OrganismHandler : MonoBehaviour
                 }
                 if (hitTransform.CompareTag("food"))
                 {
-                    Debug.DrawLine(transform.position, hit.transform.position);
                     var distance = (hit.transform.position - transform.position).magnitude;
                     _nearbyFoodCount++;
                     if (_nearestFoodDistance > distance)
@@ -232,8 +229,8 @@ public class OrganismHandler : MonoBehaviour
     public void SetBirthStats(OrganismStats stats, float startingEnergy)
     {
         _stats = stats;
-        actualSpeed = SimulationManager.instance.baseSpeed * stats.speedRatio * (2 - stats.sizeRatio);
-        actualTurnSpeed = rotationSpeed * stats.speedRatio * (2 - stats.sizeRatio);
+        actualSpeed = SimulationManager.instance.baseSpeed * stats.speedRatio * (1.0f / stats.sizeRatio);
+        actualTurnSpeed = rotationSpeed * stats.speedRatio * (1.0f / stats.sizeRatio);
         actualMaxEnergy = SimulationManager.instance.maxEnergy * stats.sizeRatio;
         _remainingEnergy = startingEnergy;
         transform.localScale = new Vector3(SimulationManager.instance.size, SimulationManager.instance.size, 1) * stats.sizeRatio;

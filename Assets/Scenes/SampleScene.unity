@@ -521,9 +521,9 @@ MonoBehaviour:
   color: {r: 1, g: 1, b: 1, a: 0}
   fieldOfView: 90
   maxViewDistance: 20
-  mutationVariance: 1
-  averageStatMutationChance: 1
-  averageGenomeMutationChance: 1
+  mutationVariance: 0.5
+  averageStatMutationChance: 0.5
+  averageGenomeMutationChance: 0.5
   organismPrefab: {fileID: 3476357127503027257, guid: 84f5743ba0cb55648b97fe0d8e68bc29, type: 3}
   inputCount: 10
   outputCount: 8
@@ -556,7 +556,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c20860c9c0920c64dbaa4cc51db1435d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  startingOrganismCount: 200
+  startingOrganismCount: 10
   startingFoodCount: 12500
   foodCutoff: 0.2
   organismCutoff: 0.5

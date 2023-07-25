@@ -11,15 +11,15 @@ public class DigestionHandler : MonoBehaviour
     public float baseMaximumEnergyUnitsInStomachMultiplier;
     public float percentageDigestionRatePerSecond;
     public float consumptionRatePerSecond;
-    public float mouthSizeRatio;
+    public float mouthLength;
     private float _maximumEnergyUnitsInStomach;
     private float _currentEnergyUnitsInStomach;
     private float _digestedEnergy;
-    private CircleCollider2D _collider;
+    private PolygonCollider2D _collider;
 
     private void Start()
     {
-        _collider = GetComponent<CircleCollider2D>();
+        _collider = GetComponent<PolygonCollider2D>();
         _handler = GetComponent<OrganismHandler>();
         _stats = _handler.GetStats();
     }
@@ -39,10 +39,17 @@ public class DigestionHandler : MonoBehaviour
     private void CheckForFood()
     {
         if (_currentEnergyUnitsInStomach >= _maximumEnergyUnitsInStomach) return;
-        Collider2D[] hits = Physics2D.OverlapCircleAll(transform.position + transform.right * _collider.bounds.extents.x,
-            _collider.bounds.extents.x * mouthSizeRatio);
-        Debug.DrawLine(transform.position, transform.position + transform.right * _collider.bounds.extents.x, Color.cyan);
-        
+        mouthLength = transform.localScale.x / 32.0f;
+        Vector2 reference = _collider.points[0];
+        Vector3 extents = new Vector3(mouthLength, reference.y * transform.localScale.y, 1.0f);
+        Collider2D[] hits = Physics2D.OverlapBoxAll(
+            transform.position + transform.right * (_collider.points[0].x * transform.localScale.x + mouthLength), extents,
+            transform.eulerAngles.z);
+        Debug.DrawLine(transform.position + transform.up * (reference.y * transform.localScale.y),
+            transform.position + transform.up * (reference.y * transform.localScale.y) + transform.right * (_collider.points[0].x * transform.localScale.x + mouthLength), Color.red);
+        Debug.DrawLine(transform.position - transform.up * (reference.y * transform.localScale.y),
+            transform.position - transform.up * (reference.y * transform.localScale.y) + transform.right * (_collider.points[0].x * transform.localScale.x + mouthLength), Color.red);
+
         foreach (var hit in hits)
         {
             if (hit.transform.CompareTag("food"))
