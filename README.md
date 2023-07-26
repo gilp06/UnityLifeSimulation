@@ -9,7 +9,11 @@ For some mechanics I ended up referencing the Bibites Wiki and implemented simil
 
 Todo: 
 []: **Unique mechanics**
+
 []: Redo digestion/energy system
+
 []: Add maturity and rework egg laying system
+
 []: Actual controls in game
+
 []: More hopefully
