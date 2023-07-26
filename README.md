@@ -8,12 +8,12 @@ Mechanics were my interpretations from the Bibites videos, the settings probably
 For some mechanics I ended up referencing the Bibites Wiki and implemented similar features such as the mutation variables.
 
 Todo: 
-[]: **Unique mechanics**
+- [ ] **Unique mechanics**
 
-[]: Redo digestion/energy system
+- [ ] Redo digestion/energy system
 
-[]: Add maturity and rework egg laying system
+- [ ] Add maturity and rework egg laying system
 
-[]: Actual controls in game
+- [ ] Actual controls in game
 
-[]: More hopefully
+- [ ] More hopefully
